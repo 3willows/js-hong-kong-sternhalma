@@ -85,83 +85,103 @@
     }
 
     function showValidMoves(fromCell) {
-      const startRow = parseInt(fromCell.dataset.row);
-      const startCol = parseInt(fromCell.dataset.col);
-      const visited = new Set();
-      const queue = [[startRow, startCol]];
+    const startRow = parseInt(fromCell.dataset.row);
+    const startCol = parseInt(fromCell.dataset.col);
+    const visited = new Map(); // Tracks minimum jumps to reach each cell
+    const queue = [[startRow, startCol, 0]]; // [row, col, jumps]
 
-      // Clear previous valid moves
-      document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
+    // Clear previous valid moves
+    document.querySelectorAll('.valid-move').forEach(c => {
+        c.classList.remove('valid-move');
+        c.textContent = '';
+    });
 
-      // Check all 8 possible directions
-      const directions = [
+    const directions = [
         [-1, -1], [-1, 0], [-1, 1],
-        [0, -1], [0, 1],
-        [1, -1], [1, 0], [1, 1]
-      ];
+        [0, -1],          [0, 1],
+        [1, -1],  [1, 0], [1, 1]
+    ];
 
-      function isPathClear(startR, startC, endR, endC) {
+    function isPathClear(startR, startC, endR, endC) {
         const dr = Math.sign(endR - startR);
         const dc = Math.sign(endC - startC);
         let r = startR + dr;
         let c = startC + dc;
-
+        
         while (r !== endR || c !== endC) {
-          if (getCell(r, c).querySelector('.piece')) return false;
-          r += dr;
-          c += dc;
+            if (getCell(r, c).querySelector('.piece')) return false;
+            r += dr;
+            c += dc;
         }
         return true;
-      }
+    }
 
-      while (queue.length > 0) {
-        const [row, col] = queue.shift();
+    // Process jump moves with BFS
+    while (queue.length > 0) {
+        const [row, col, jumps] = queue.shift();
+        const key = `${row},${col}`;
+        
+        // Skip if we've already found a better path
+        if (visited.has(key) && visited.get(key) <= jumps) continue;
+        visited.set(key, jumps);
 
         for (const [dr, dc] of directions) {
-          let step = 1;
-          while (true) {
-            const checkRow = row + dr * step;
-            const checkCol = col + dc * step;
+            let step = 1;
+            while (true) {
+                const checkRow = row + dr * step;
+                const checkCol = col + dc * step;
+                
+                if (!isValidCell(checkRow, checkCol)) break;
 
-            if (!isValidCell(checkRow, checkCol)) break;
-
-            const checkCell = getCell(checkRow, checkCol);
-            if (checkCell.querySelector('.piece')) {
-              // Verify path to this piece is clear
-              if (isPathClear(row, col, checkRow, checkCol)) {
-                const jumpRow = row + dr * (step * 2);
-                const jumpCol = col + dc * (step * 2);
-
-                if (isValidCell(jumpRow, jumpCol)) {
-                  const jumpCell = getCell(jumpRow, jumpCol);
-                  const jumpKey = `${jumpRow},${jumpCol}`;
-
-                  if (!jumpCell.querySelector('.piece') && !visited.has(jumpKey)) {
-                    jumpCell.classList.add('valid-move');
-                    visited.add(jumpKey);
-                    queue.push([jumpRow, jumpCol]);
-                  }
+                const checkCell = getCell(checkRow, checkCol);
+                if (checkCell.querySelector('.piece')) {
+                    if (isPathClear(row, col, checkRow, checkCol)) {
+                        const jumpRow = row + dr * (step * 2);
+                        const jumpCol = col + dc * (step * 2);
+                        
+                        if (isValidCell(jumpRow, jumpCol)) {
+                            const jumpKey = `${jumpRow},${jumpCol}`;
+                            const totalJumps = jumps + 1;
+                            const jumpCell = getCell(jumpRow, jumpCol);
+                            
+                            if (!jumpCell.querySelector('.piece') && 
+                                (!visited.has(jumpKey) || totalJumps < visited.get(jumpKey))) {
+                                queue.push([jumpRow, jumpCol, totalJumps]);
+                                jumpCell.classList.add('valid-move');
+                                jumpCell.textContent = totalJumps;
+                            }
+                        }
+                    }
+                    break;
                 }
-              }
-              break;
+                step++;
             }
-            step++;
-          }
         }
-      }
+    }
 
-      // Single-step moves (original code remains)
-      for (const [dr, dc] of directions) {
+    // Add single-step moves (0 jumps)
+    for (const [dr, dc] of directions) {
         const targetRow = startRow + dr;
         const targetCol = startCol + dc;
         if (isValidCell(targetRow, targetCol)) {
-          const cell = getCell(targetRow, targetCol);
-          if (!cell.querySelector('.piece')) {
-            cell.classList.add('valid-move');
-          }
+            const cell = getCell(targetRow, targetCol);
+            if (!cell.querySelector('.piece')) {
+                cell.classList.add('valid-move');
+                cell.textContent = '0';
+            }
         }
-      }
     }
+
+    // Merge and prioritize lower jump counts
+    visited.forEach((jumps, key) => {
+        const [row, col] = key.split(',').map(Number);
+        const cell = getCell(row, col);
+        if (cell.textContent === '' || jumps < parseInt(cell.textContent)) {
+            cell.textContent = jumps.toString();
+        }
+    });
+}
+
 
 
 

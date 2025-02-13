@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@
       margin: 0;
       background-color: #f0f0f0;
     }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(20, 30px);
@@ -22,6 +24,7 @@
       padding: 5px;
       border-radius: 5px;
     }
+
     .cell {
       width: 30px;
       height: 30px;
@@ -29,6 +32,7 @@
       position: relative;
       cursor: pointer;
     }
+
     .piece {
       width: 24px;
       height: 24px;
@@ -38,17 +42,26 @@
       left: 3px;
       transition: transform 0.2s;
     }
-    .player1 { background-color: #ff4444; }
-    .player2 { background-color: #4444ff; }
+
+    .player1 {
+      background-color: #ff4444;
+    }
+
+    .player2 {
+      background-color: #4444ff;
+    }
+
     .selected {
       transform: scale(1.2);
-      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     }
+
     .valid-move {
       background-color: #e0ffe0;
     }
   </style>
 </head>
+
 <body>
   <div class="grid" id="grid"></div>
 
@@ -56,22 +69,22 @@
     const rows = 5, cols = 20;
     let selectedPiece = null;
     const grid = document.getElementById('grid');
-    
+
     // Initialize board
     function createBoard() {
-      for(let row = 0; row < rows; row++) {
-        for(let col = 0; col < cols; col++) {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
           const cell = document.createElement('div');
           cell.className = 'cell';
           cell.dataset.row = row;
           cell.dataset.col = col;
 
           // Add starting pieces
-          if(col < 2 && row * 2 + col < 10) {  // Player 1 (left)
+          if (col < 2 && row * 2 + col < 10) {  // Player 1 (left)
             const piece = createPiece('player1');
             cell.appendChild(piece);
           }
-          if(col >= cols - 2 && (row * 2 + (cols - col - 1)) < 10) {  // Player 2 (right)
+          if (col >= cols - 2 && (row * 2 + (cols - col - 1)) < 10) {  // Player 2 (right)
             const piece = createPiece('player2');
             cell.appendChild(piece);
           }
@@ -89,49 +102,78 @@
     }
 
     function handleClick(e) {
-      const cell = e.currentTarget;
-      const piece = cell.querySelector('.piece');
+  const cell = e.currentTarget;
+  const piece = cell.querySelector('.piece');
+  
+  if (selectedPiece) {
+    if (cell.classList.contains('valid-move')) {
+      // Check if it's a jump move
+      const rowDiff = Math.abs(selectedPiece.row - parseInt(cell.dataset.row));
+      const colDiff = Math.abs(selectedPiece.col - parseInt(cell.dataset.col));
       
-      if (selectedPiece) {
-        // Move piece if valid
-        if (cell.classList.contains('valid-move')) {
-          movePiece(selectedPiece, cell);
-          clearSelection();
-        } else {
-          clearSelection();
-        }
-      } else if (piece) {
-        // Select piece
-        selectedPiece = { 
-          element: piece, 
-          row: parseInt(cell.dataset.row),
-          col: parseInt(cell.dataset.col)
-        };
-        piece.classList.add('selected');
-        showValidMoves(cell);
+      // If moving 2 spaces, it's a jump
+      if(rowDiff === 2 || colDiff === 2) {
+        // Calculate jumped piece position
+        const jumpedRow = (selectedPiece.row + parseInt(cell.dataset.row)) / 2;
+        const jumpedCol = (selectedPiece.col + parseInt(cell.dataset.col)) / 2;
+        const jumpedCell = getCell(jumpedRow, jumpedCol);
+        
+        // You could add logic here to handle jumped pieces
+        // (e.g., remove them in Checkers-style games)
       }
+      
+      movePiece(selectedPiece, cell);
+      clearSelection();
+    } else {
+      clearSelection();
     }
+  } else if (piece) {
+    selectedPiece = { 
+      element: piece, 
+      row: parseInt(cell.dataset.row),
+      col: parseInt(cell.dataset.col)
+    };
+    piece.classList.add('selected');
+    showValidMoves(cell);
+  }
+}
 
     function showValidMoves(fromCell) {
       const row = parseInt(fromCell.dataset.row);
       const col = parseInt(fromCell.dataset.col);
-      
+
       // Check all adjacent cells
-      for(let r = -1; r <= 1; r++) {
-        for(let c = -1; c <= 1; c++) {
-          if(r === 0 && c === 0) continue;
+      for (let r = -1; r <= 1; r++) {
+        for (let c = -1; c <= 1; c++) {
+          if (r === 0 && c === 0) continue; // Skip current cell
+
+          // First check adjacent cell
           const targetRow = row + r;
           const targetCol = col + c;
-          
-          if(isValidCell(targetRow, targetCol)) {
+
+          if (isValidCell(targetRow, targetCol)) {
             const targetCell = getCell(targetRow, targetCol);
-            if(!targetCell.querySelector('.piece')) {
+
+            if (!targetCell.querySelector('.piece')) {
+              // Regular move
               targetCell.classList.add('valid-move');
+            } else {
+              // Check jump possibility
+              const jumpRow = targetRow + r;
+              const jumpCol = targetCol + c;
+
+              if (isValidCell(jumpRow, jumpCol)) {
+                const jumpCell = getCell(jumpRow, jumpCol);
+                if (!jumpCell.querySelector('.piece')) {
+                  jumpCell.classList.add('valid-move');
+                }
+              }
             }
           }
         }
       }
     }
+
 
     function movePiece(from, toCell) {
       toCell.appendChild(from.element);
@@ -140,7 +182,7 @@
 
     function clearSelection() {
       document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
-      if(selectedPiece) {
+      if (selectedPiece) {
         selectedPiece.element.classList.remove('selected');
         selectedPiece = null;
       }
@@ -157,4 +199,5 @@
     createBoard();
   </script>
 </body>
+
 </html>

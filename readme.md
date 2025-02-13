@@ -40,3 +40,5 @@ After that, I had to do a degree of thinking.  For example,
 - Save the past moves.  Once that is done, presumably can train by some kind of repeated trial and error?
 
 - Repeatedly ask LLM to "make the code better", which apparent does make it better.
+
+- Properly test and debug: obviously illegal moves sometimes come to the surface.

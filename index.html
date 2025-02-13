@@ -19,8 +19,6 @@
     // Add at the top with other constants
     let currentPlayer = 'player1';
 
-
-
     // Initialize board
     function createBoard() {
       for (let row = 0; row < rows; row++) {
@@ -96,7 +94,6 @@
       }
     }
 
-
     function showValidMoves(fromCell) {
       const startRow = parseInt(fromCell.dataset.row);
       const startCol = parseInt(fromCell.dataset.col);
@@ -128,6 +125,7 @@
         }
         return true;
       }
+
       // Process jump moves with BFS
       while (queue.length > 0) {
         const [row, col, jumps] = queue.shift();
@@ -202,9 +200,6 @@
         }
       });
     }
-
-
-
 
     function movePiece(from, toCell) {
       toCell.appendChild(from.element);

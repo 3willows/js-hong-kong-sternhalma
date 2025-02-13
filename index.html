@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simplified Sternhalma</title>
+  <title>Sternhalma Simplified</title>
   <style>
     body {
       display: flex;
@@ -11,58 +11,150 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #f4f4f4;
+      background-color: #f0f0f0;
     }
     .grid {
       display: grid;
       grid-template-columns: repeat(20, 30px);
       grid-template-rows: repeat(5, 30px);
       gap: 2px;
+      background: #fff;
+      padding: 5px;
+      border-radius: 5px;
     }
     .cell {
       width: 30px;
       height: 30px;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      text-align: center;
-      line-height: 30px;
+      border: 1px solid #ddd;
+      position: relative;
       cursor: pointer;
     }
-    .cell:hover {
-      background-color: #e0e0e0;
+    .piece {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
     }
-    .active {
-      background-color: #90caf9; /* Highlighted color for active cells */
+    .player1 { background-color: #ff4444; }
+    .player2 { background-color: #4444ff; }
+    .selected {
+      transform: scale(1.2);
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    .valid-move {
+      background-color: #e0ffe0;
     }
   </style>
 </head>
 <body>
-  <div class="grid" id="gameGrid"></div>
+  <div class="grid" id="grid"></div>
 
   <script>
-    const rows = 5; // Number of rows
-    const cols = 20; // Number of columns
+    const rows = 5, cols = 20;
+    let selectedPiece = null;
+    const grid = document.getElementById('grid');
+    
+    // Initialize board
+    function createBoard() {
+      for(let row = 0; row < rows; row++) {
+        for(let col = 0; col < cols; col++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = row;
+          cell.dataset.col = col;
 
-    // Get the grid container
-    const gridContainer = document.getElementById('gameGrid');
+          // Add starting pieces
+          if(col < 2 && row * 2 + col < 10) {  // Player 1 (left)
+            const piece = createPiece('player1');
+            cell.appendChild(piece);
+          }
+          if(col >= cols - 2 && (row * 2 + (cols - col - 1)) < 10) {  // Player 2 (right)
+            const piece = createPiece('player2');
+            cell.appendChild(piece);
+          }
 
-    // Create the grid dynamically
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const cell = document.createElement('div');
-        cell.classList.add('cell');
-        cell.dataset.row = row; // Store row index
-        cell.dataset.col = col; // Store column index
-
-        // Add click event to highlight the cell
-        cell.addEventListener('click', () => {
-          cell.classList.toggle('active');
-          console.log(`Clicked cell at Row ${row}, Column ${col}`);
-        });
-
-        gridContainer.appendChild(cell);
+          cell.addEventListener('click', handleClick);
+          grid.appendChild(cell);
+        }
       }
     }
+
+    function createPiece(playerClass) {
+      const piece = document.createElement('div');
+      piece.className = `piece ${playerClass}`;
+      return piece;
+    }
+
+    function handleClick(e) {
+      const cell = e.currentTarget;
+      const piece = cell.querySelector('.piece');
+      
+      if (selectedPiece) {
+        // Move piece if valid
+        if (cell.classList.contains('valid-move')) {
+          movePiece(selectedPiece, cell);
+          clearSelection();
+        } else {
+          clearSelection();
+        }
+      } else if (piece) {
+        // Select piece
+        selectedPiece = { 
+          element: piece, 
+          row: parseInt(cell.dataset.row),
+          col: parseInt(cell.dataset.col)
+        };
+        piece.classList.add('selected');
+        showValidMoves(cell);
+      }
+    }
+
+    function showValidMoves(fromCell) {
+      const row = parseInt(fromCell.dataset.row);
+      const col = parseInt(fromCell.dataset.col);
+      
+      // Check all adjacent cells
+      for(let r = -1; r <= 1; r++) {
+        for(let c = -1; c <= 1; c++) {
+          if(r === 0 && c === 0) continue;
+          const targetRow = row + r;
+          const targetCol = col + c;
+          
+          if(isValidCell(targetRow, targetCol)) {
+            const targetCell = getCell(targetRow, targetCol);
+            if(!targetCell.querySelector('.piece')) {
+              targetCell.classList.add('valid-move');
+            }
+          }
+        }
+      }
+    }
+
+    function movePiece(from, toCell) {
+      toCell.appendChild(from.element);
+      from.element.classList.remove('selected');
+    }
+
+    function clearSelection() {
+      document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
+      if(selectedPiece) {
+        selectedPiece.element.classList.remove('selected');
+        selectedPiece = null;
+      }
+    }
+
+    function isValidCell(row, col) {
+      return row >= 0 && row < rows && col >= 0 && col < cols;
+    }
+
+    function getCell(row, col) {
+      return document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    }
+
+    createBoard();
   </script>
 </body>
 </html>

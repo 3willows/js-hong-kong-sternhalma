@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simplified Sternhalma</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(20, 30px);
+      grid-template-rows: repeat(5, 30px);
+      gap: 2px;
+    }
+    .cell {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      text-align: center;
+      line-height: 30px;
+      cursor: pointer;
+    }
+    .cell:hover {
+      background-color: #e0e0e0;
+    }
+    .active {
+      background-color: #90caf9; /* Highlighted color for active cells */
+    }
+  </style>
+</head>
+<body>
+  <div class="grid" id="gameGrid"></div>
+
+  <script>
+    const rows = 5; // Number of rows
+    const cols = 20; // Number of columns
+
+    // Get the grid container
+    const gridContainer = document.getElementById('gameGrid');
+
+    // Create the grid dynamically
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.row = row; // Store row index
+        cell.dataset.col = col; // Store column index
+
+        // Add click event to highlight the cell
+        cell.addEventListener('click', () => {
+          cell.classList.toggle('active');
+          console.log(`Clicked cell at Row ${row}, Column ${col}`);
+        });
+
+        gridContainer.appendChild(cell);
+      }
+    }
+  </script>
+</body>
+</html>

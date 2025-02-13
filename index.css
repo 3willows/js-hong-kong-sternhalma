@@ -53,12 +53,19 @@ body {
 }
 
 .turn-display {
-  padding: 10px;
-  margin-bottom: 20px;
+  position: fixed;  /* Keep fixed at top */
+  top: 0;           /* Anchor to top */
+  left: 0;          /* Stretch full width */
+  right: 0;
+  padding: 10px 0;  /* Vertical padding */
+  margin-bottom: 0; /* Remove original margin */
   font-size: 1.5em;
   font-weight: bold;
   text-align: center;
+  background: white; /* Ensure readability */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Visual separation */
+  z-index: 1000;     /* Keep above other content */
 }
 
-.turn-display.player1 { color: blue; }
-.turn-display.player2 { color: red; }
+.turn-display.player1 { color: red; }
+.turn-display.player2 { color: blue; }

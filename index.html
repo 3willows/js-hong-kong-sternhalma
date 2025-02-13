@@ -102,77 +102,108 @@
     }
 
     function handleClick(e) {
-  const cell = e.currentTarget;
-  const piece = cell.querySelector('.piece');
-  
-  if (selectedPiece) {
-    if (cell.classList.contains('valid-move')) {
-      // Check if it's a jump move
-      const rowDiff = Math.abs(selectedPiece.row - parseInt(cell.dataset.row));
-      const colDiff = Math.abs(selectedPiece.col - parseInt(cell.dataset.col));
-      
-      // If moving 2 spaces, it's a jump
-      if(rowDiff === 2 || colDiff === 2) {
-        // Calculate jumped piece position
-        const jumpedRow = (selectedPiece.row + parseInt(cell.dataset.row)) / 2;
-        const jumpedCol = (selectedPiece.col + parseInt(cell.dataset.col)) / 2;
-        const jumpedCell = getCell(jumpedRow, jumpedCol);
-        
-        // You could add logic here to handle jumped pieces
-        // (e.g., remove them in Checkers-style games)
+      const cell = e.currentTarget;
+      const piece = cell.querySelector('.piece');
+
+      if (selectedPiece) {
+        if (cell.classList.contains('valid-move')) {
+          // Check if it's a jump move
+          const rowDiff = Math.abs(selectedPiece.row - parseInt(cell.dataset.row));
+          const colDiff = Math.abs(selectedPiece.col - parseInt(cell.dataset.col));
+
+          // If moving 2 spaces, it's a jump
+          if (rowDiff === 2 || colDiff === 2) {
+            // Calculate jumped piece position
+            const jumpedRow = (selectedPiece.row + parseInt(cell.dataset.row)) / 2;
+            const jumpedCol = (selectedPiece.col + parseInt(cell.dataset.col)) / 2;
+            const jumpedCell = getCell(jumpedRow, jumpedCol);
+
+            // You could add logic here to handle jumped pieces
+            // (e.g., remove them in Checkers-style games)
+          }
+
+          movePiece(selectedPiece, cell);
+          clearSelection();
+        } else {
+          clearSelection();
+        }
+      } else if (piece) {
+        selectedPiece = {
+          element: piece,
+          row: parseInt(cell.dataset.row),
+          col: parseInt(cell.dataset.col)
+        };
+        piece.classList.add('selected');
+        showValidMoves(cell);
       }
-      
-      movePiece(selectedPiece, cell);
-      clearSelection();
-    } else {
-      clearSelection();
     }
-  } else if (piece) {
-    selectedPiece = { 
-      element: piece, 
-      row: parseInt(cell.dataset.row),
-      col: parseInt(cell.dataset.col)
-    };
-    piece.classList.add('selected');
-    showValidMoves(cell);
-  }
-}
 
     function showValidMoves(fromCell) {
-      const row = parseInt(fromCell.dataset.row);
-      const col = parseInt(fromCell.dataset.col);
+      const startRow = parseInt(fromCell.dataset.row);
+      const startCol = parseInt(fromCell.dataset.col);
+      const visited = new Set();
+      const queue = [[startRow, startCol]];
+      visited.add(`${startRow},${startCol}`);
 
-      // Check all adjacent cells
-      for (let r = -1; r <= 1; r++) {
-        for (let c = -1; c <= 1; c++) {
-          if (r === 0 && c === 0) continue; // Skip current cell
+      // Clear previous valid moves
+      document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
 
-          // First check adjacent cell
-          const targetRow = row + r;
-          const targetCol = col + c;
+      // Check all 8 possible directions (orthogonal + diagonal)
+      const directions = [
+        [-1, -1], [-1, 0], [-1, 1],
+        [0, -1], [0, 1],
+        [1, -1], [1, 0], [1, 1]
+      ];
 
-          if (isValidCell(targetRow, targetCol)) {
-            const targetCell = getCell(targetRow, targetCol);
+      while (queue.length > 0) {
+        const [row, col] = queue.shift();
 
-            if (!targetCell.querySelector('.piece')) {
-              // Regular move
-              targetCell.classList.add('valid-move');
-            } else {
-              // Check jump possibility
-              const jumpRow = targetRow + r;
-              const jumpCol = targetCol + c;
+        // Check all directions from current position
+        for (const [dr, dc] of directions) {
+          let step = 1;
+          while (true) {
+            // Check intermediate positions
+            const checkRow = row + dr * step;
+            const checkCol = col + dc * step;
+
+            if (!isValidCell(checkRow, checkCol)) break;
+
+            const checkCell = getCell(checkRow, checkCol);
+            if (checkCell.querySelector('.piece')) {
+              // Calculate jump landing position
+              const jumpRow = row + dr * (step * 2);
+              const jumpCol = col + dc * (step * 2);
 
               if (isValidCell(jumpRow, jumpCol)) {
                 const jumpCell = getCell(jumpRow, jumpCol);
-                if (!jumpCell.querySelector('.piece')) {
+                const jumpKey = `${jumpRow},${jumpCol}`;
+
+                if (!jumpCell.querySelector('.piece') && !visited.has(jumpKey)) {
                   jumpCell.classList.add('valid-move');
+                  visited.add(jumpKey);
+                  queue.push([jumpRow, jumpCol]); // Allow chained jumps
                 }
               }
+              break; // Only consider first piece in this direction
             }
+            step++;
+          }
+        }
+      }
+
+      // Also show adjacent single-step moves
+      for (const [dr, dc] of directions) {
+        const targetRow = startRow + dr;
+        const targetCol = startCol + dc;
+        if (isValidCell(targetRow, targetCol)) {
+          const cell = getCell(targetRow, targetCol);
+          if (!cell.querySelector('.piece')) {
+            cell.classList.add('valid-move');
           }
         }
       }
     }
+
 
 
     function movePiece(from, toCell) {

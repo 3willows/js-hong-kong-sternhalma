@@ -58,7 +58,7 @@
           const colDiff = Math.abs(selectedPiece.col - parseInt(cell.dataset.col));
 
           // If moving 2 spaces, it's a jump
-          if (rowDiff === 2 || colDiff === 2) {
+          if (rowDiff >= 2 || colDiff >= 2) {
             // Calculate jumped piece position
             const jumpedRow = (selectedPiece.row + parseInt(cell.dataset.row)) / 2;
             const jumpedCol = (selectedPiece.col + parseInt(cell.dataset.col)) / 2;

@@ -35,5 +35,8 @@ After that, I had to do a degree of thinking.  For example,
 
 ## Might do later
 
-- Add AI: the simplest would be to make whichever move would jump the furtherest?
+- Add AI: the simplest would be to make whichever move would jump the furtherest for each turn?
+
 - Save the past moves.  Once that is done, presumably can train by some kind of repeated trial and error?
+
+- Repeatedly ask LLM to "make the code better", which apparent does make it better.

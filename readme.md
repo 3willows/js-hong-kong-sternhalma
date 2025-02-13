@@ -26,3 +26,8 @@ Prompts to get the project started.
 Later steps:
 
 - Check to ensure that the jumping behaviour is correct.  For each jump, one piece can jump over exactly one piece only.
+
+
+## Notes
+
+- Sometimes I did need to think.  For example, using "textContent" to record the number of jumps required to get somewhere was too aggressive.  Clearing it by "setting cell.textContent = """ took out everything within as well (including the piece).

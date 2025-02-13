@@ -16,6 +16,11 @@
     let selectedPiece = null;
     const grid = document.getElementById('grid');
 
+    // Add at the top with other constants
+    let currentPlayer = 'player1';
+
+
+
     // Initialize board
     function createBoard() {
       for (let row = 0; row < rows; row++) {
@@ -38,7 +43,20 @@
           cell.addEventListener('click', handleClick);
           grid.appendChild(cell);
         }
+        // Add turn display
+        const turnDisplay = document.createElement('div');
+        turnDisplay.id = 'turn-display';
+        document.body.insertBefore(turnDisplay, grid);
+
+        // Existing board creation code...
+        updateTurnDisplay(); // Initialize display
       }
+    }
+
+    function updateTurnDisplay() {
+      const turnDisplay = document.getElementById('turn-display');
+      turnDisplay.textContent = `${currentPlayer === 'player1' ? 'Player 1' : 'Player 2'}'s Turn`;
+      turnDisplay.className = `turn-display ${currentPlayer}`;
     }
 
     function createPiece(playerClass) {
@@ -50,15 +68,23 @@
     function handleClick(e) {
       const cell = e.currentTarget;
       const piece = cell.querySelector('.piece');
+
       if (selectedPiece) {
         if (cell.classList.contains('valid-move')) {
           // Existing move logic
           movePiece(selectedPiece, cell);
           clearSelection();
+
+          // Switch players after valid move
+          currentPlayer = currentPlayer === 'player1' ? 'player2' : 'player1';
+          updateTurnDisplay();
+
         } else {
           clearSelection();
         }
       } else if (piece) {
+        if (!piece.classList.contains(currentPlayer)) return;
+
         selectedPiece = {
           element: piece,
           row: parseInt(cell.dataset.row),

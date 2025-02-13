@@ -51,3 +51,14 @@ body {
 .valid-move {
   background-color: #e0ffe0;
 }
+
+.turn-display {
+  padding: 10px;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.turn-display.player1 { color: blue; }
+.turn-display.player2 { color: red; }

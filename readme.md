@@ -1,4 +1,8 @@
-# About
+# Website
+
+https://3willows.github.io/super-chinese-checkers/
+
+## About
 
 The version of Chinese Checkers I play at home is apparently a variation called ["Super Chinese Checkers"](https://www.mastersofgames.com/rules/chinese-checkers-rules.htm), where (quote)
 
@@ -23,11 +27,13 @@ Prompts to get the project started.
 - Now add 2-step jumping. Example. Suppose there is a piece at (0,0), nothing at (0,1), a piece (pivot) at (0,2), nothing at (0,3) and (0,4). Then you should be able to jump from (0,0) to (0,4).
 - No. The modification should implement something like super-chinese-checkers, were a piece may jump over a piece any number of empty spaces away, provided it can land the same number of empty spaces beyond it in a straight line.
 
-Later steps:
+After that, I had to do a degree of thinking.  For example, 
 
-- Check to ensure that the jumping behaviour is correct.  For each jump, one piece can jump over exactly one piece only.
+- it took some wrangling to get the jumping behaviour to work correctly?
 
+- using "textContent" to record the number of jumps required to get somewhere was too aggressive.  Clearing it by "setting cell.textContent = """ took out everything within as well (including the piece).
 
-## Notes
+## Might do later
 
-- Sometimes I did need to think.  For example, using "textContent" to record the number of jumps required to get somewhere was too aggressive.  Clearing it by "setting cell.textContent = """ took out everything within as well (including the piece).
+- Add AI: the simplest would be to make whichever move would jump the furtherest?
+- Save the past moves.  Once that is done, presumably can train by some kind of repeated trial and error?

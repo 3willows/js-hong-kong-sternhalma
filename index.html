@@ -89,26 +89,37 @@
       const startCol = parseInt(fromCell.dataset.col);
       const visited = new Set();
       const queue = [[startRow, startCol]];
-      visited.add(`${startRow},${startCol}`);
 
       // Clear previous valid moves
       document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
 
-      // Check all 8 possible directions (orthogonal + diagonal)
+      // Check all 8 possible directions
       const directions = [
         [-1, -1], [-1, 0], [-1, 1],
         [0, -1], [0, 1],
         [1, -1], [1, 0], [1, 1]
       ];
 
+      function isPathClear(startR, startC, endR, endC) {
+        const dr = Math.sign(endR - startR);
+        const dc = Math.sign(endC - startC);
+        let r = startR + dr;
+        let c = startC + dc;
+
+        while (r !== endR || c !== endC) {
+          if (getCell(r, c).querySelector('.piece')) return false;
+          r += dr;
+          c += dc;
+        }
+        return true;
+      }
+
       while (queue.length > 0) {
         const [row, col] = queue.shift();
 
-        // Check all directions from current position
         for (const [dr, dc] of directions) {
           let step = 1;
           while (true) {
-            // Check intermediate positions
             const checkRow = row + dr * step;
             const checkCol = col + dc * step;
 
@@ -116,28 +127,30 @@
 
             const checkCell = getCell(checkRow, checkCol);
             if (checkCell.querySelector('.piece')) {
-              // Calculate jump landing position
-              const jumpRow = row + dr * (step * 2);
-              const jumpCol = col + dc * (step * 2);
+              // Verify path to this piece is clear
+              if (isPathClear(row, col, checkRow, checkCol)) {
+                const jumpRow = row + dr * (step * 2);
+                const jumpCol = col + dc * (step * 2);
 
-              if (isValidCell(jumpRow, jumpCol)) {
-                const jumpCell = getCell(jumpRow, jumpCol);
-                const jumpKey = `${jumpRow},${jumpCol}`;
+                if (isValidCell(jumpRow, jumpCol)) {
+                  const jumpCell = getCell(jumpRow, jumpCol);
+                  const jumpKey = `${jumpRow},${jumpCol}`;
 
-                if (!jumpCell.querySelector('.piece') && !visited.has(jumpKey)) {
-                  jumpCell.classList.add('valid-move');
-                  visited.add(jumpKey);
-                  queue.push([jumpRow, jumpCol]); // Allow chained jumps
+                  if (!jumpCell.querySelector('.piece') && !visited.has(jumpKey)) {
+                    jumpCell.classList.add('valid-move');
+                    visited.add(jumpKey);
+                    queue.push([jumpRow, jumpCol]);
+                  }
                 }
               }
-              break; // Only consider first piece in this direction
+              break;
             }
             step++;
           }
         }
       }
 
-      // Also show adjacent single-step moves
+      // Single-step moves (original code remains)
       for (const [dr, dc] of directions) {
         const targetRow = startRow + dr;
         const targetCol = startCol + dc;

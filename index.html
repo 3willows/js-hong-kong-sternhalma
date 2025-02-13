@@ -4,62 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sternhalma Simplified</title>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f0f0f0;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(20, 30px);
-      grid-template-rows: repeat(5, 30px);
-      gap: 2px;
-      background: #fff;
-      padding: 5px;
-      border-radius: 5px;
-    }
-
-    .cell {
-      width: 30px;
-      height: 30px;
-      border: 1px solid #ddd;
-      position: relative;
-      cursor: pointer;
-    }
-
-    .piece {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      transition: transform 0.2s;
-    }
-
-    .player1 {
-      background-color: #ff4444;
-    }
-
-    .player2 {
-      background-color: #4444ff;
-    }
-
-    .selected {
-      transform: scale(1.2);
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    }
-
-    .valid-move {
-      background-color: #e0ffe0;
-    }
-  </style>
+  <title>Super Chinese Checkers</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 
 <body>

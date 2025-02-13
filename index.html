@@ -52,18 +52,7 @@
       const piece = cell.querySelector('.piece');
       if (selectedPiece) {
         if (cell.classList.contains('valid-move')) {
-          // Check if it's a jump move
-          const rowDiff = Math.abs(selectedPiece.row - parseInt(cell.dataset.row));
-          const colDiff = Math.abs(selectedPiece.col - parseInt(cell.dataset.col));
-
-          // If moving more than 2 spaces, it's a jump
-          if (rowDiff >= 2 || colDiff >= 2) {
-            // Calculate jumped piece position
-            const jumpedRow = (selectedPiece.row + parseInt(cell.dataset.row)) / 2;
-            const jumpedCol = (selectedPiece.col + parseInt(cell.dataset.col)) / 2;
-            const jumpedCell = getCell(jumpedRow, jumpedCol);
-          }
-
+          // Existing move logic
           movePiece(selectedPiece, cell);
           clearSelection();
         } else {
@@ -75,10 +64,12 @@
           row: parseInt(cell.dataset.row),
           col: parseInt(cell.dataset.col)
         };
-        piece.classList.add('selected');
+        // Add special class to selected piece
+        piece.classList.add('selected', 'selected-piece');
         showValidMoves(cell);
       }
     }
+
 
     function showValidMoves(fromCell) {
       const startRow = parseInt(fromCell.dataset.row);
@@ -104,13 +95,13 @@
         let c = startC + dc;
 
         while (r !== endR || c !== endC) {
-          if (getCell(r, c).querySelector('.piece')) return false;
+          // Ignore selected piece in path checks
+          if (getCell(r, c).querySelector('.piece:not(.selected-piece)')) return false;
           r += dr;
           c += dc;
         }
         return true;
       }
-
       // Process jump moves with BFS
       while (queue.length > 0) {
         const [row, col, jumps] = queue.shift();
@@ -195,12 +186,10 @@
     }
 
     function clearSelection() {
-      document.querySelectorAll('.valid-move').forEach(c => {
-        c.classList.remove('valid-move')
-      });
+      document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
       document.querySelectorAll('.jump-number').forEach(n => n.remove());
       if (selectedPiece) {
-        selectedPiece.element.classList.remove('selected');
+        selectedPiece.element.classList.remove('selected', 'selected-piece');
         selectedPiece = null;
       }
     }

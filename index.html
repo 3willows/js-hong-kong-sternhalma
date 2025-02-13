@@ -56,15 +56,12 @@
           const rowDiff = Math.abs(selectedPiece.row - parseInt(cell.dataset.row));
           const colDiff = Math.abs(selectedPiece.col - parseInt(cell.dataset.col));
 
-          // If moving 2 spaces, it's a jump
+          // If moving more than 2 spaces, it's a jump
           if (rowDiff >= 2 || colDiff >= 2) {
             // Calculate jumped piece position
             const jumpedRow = (selectedPiece.row + parseInt(cell.dataset.row)) / 2;
             const jumpedCol = (selectedPiece.col + parseInt(cell.dataset.col)) / 2;
             const jumpedCell = getCell(jumpedRow, jumpedCol);
-
-            // You could add logic here to handle jumped pieces
-            // (e.g., remove them in Checkers-style games)
           }
 
           movePiece(selectedPiece, cell);
@@ -92,7 +89,6 @@
       // Clear previous valid moves
       document.querySelectorAll('.valid-move').forEach(c => {
         c.classList.remove('valid-move');
-        c.textContent = '';
       });
 
       const directions = [
@@ -147,8 +143,17 @@
                     (!visited.has(jumpKey) || totalJumps < visited.get(jumpKey))) {
                     queue.push([jumpRow, jumpCol, totalJumps]);
                     jumpCell.classList.add('valid-move');
-                    jumpCell.textContent = totalJumps;
+
+                    // Remove existing jump number first to prevent duplicates
+                    const existingNumber = jumpCell.querySelector('.jump-number');
+                    if (existingNumber) existingNumber.remove();
+
+                    const jumpNumber = document.createElement('span');
+                    jumpNumber.className = 'jump-number';
+                    jumpNumber.textContent = totalJumps;
+                    jumpCell.appendChild(jumpNumber);
                   }
+
                 }
               }
               break;
@@ -166,7 +171,6 @@
           const cell = getCell(targetRow, targetCol);
           if (!cell.querySelector('.piece')) {
             cell.classList.add('valid-move');
-            cell.textContent = '';
           }
         }
       }
@@ -176,7 +180,8 @@
         const [row, col] = key.split(',').map(Number);
         const cell = getCell(row, col);
         if (cell.textContent === '' || jumps < parseInt(cell.textContent)) {
-          cell.textContent = jumps.toString();
+          const jumpNumber = document.createElement('span');
+          jumpNumber.textContent = jumps.toString();
         }
       });
     }
@@ -190,7 +195,10 @@
     }
 
     function clearSelection() {
-      document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
+      document.querySelectorAll('.valid-move').forEach(c => {
+        c.classList.remove('valid-move')
+      });
+      document.querySelectorAll('.jump-number').forEach(n => n.remove());
       if (selectedPiece) {
         selectedPiece.element.classList.remove('selected');
         selectedPiece = null;

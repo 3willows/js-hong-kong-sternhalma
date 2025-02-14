@@ -15,7 +15,7 @@
     const rows = 5, cols = 20;
     let selectedPiece = null;
     const grid = document.getElementById('grid');
-    
+
 
     // Add at the top with other constants
     let currentPlayer = 'player1';
@@ -110,6 +110,21 @@
       }
     }
 
+    function isPathClear(startR, startC, endR, endC) {
+      const dr = Math.sign(endR - startR);
+      const dc = Math.sign(endC - startC);
+      let r = startR + dr;
+      let c = startC + dc;
+
+      while (r !== endR || c !== endC) {
+        // Ignore selected piece in path checks
+        if (getCell(r, c).querySelector('.piece:not(.selected-piece)')) return false;
+        r += dr;
+        c += dc;
+      }
+      return true;
+    }
+
     function showValidMoves(fromCell) {
       const startRow = parseInt(fromCell.dataset.row);
       const startCol = parseInt(fromCell.dataset.col);
@@ -122,21 +137,28 @@
         [1, -1], [1, 0], [1, 1]
       ];
 
-      function isPathClear(startR, startC, endR, endC) {
-        const dr = Math.sign(endR - startR);
-        const dc = Math.sign(endC - startC);
-        let r = startR + dr;
-        let c = startC + dc;
-
-        while (r !== endR || c !== endC) {
-          // Ignore selected piece in path checks
-          if (getCell(r, c).querySelector('.piece:not(.selected-piece)')) return false;
-          r += dr;
-          c += dc;
+      // Add single-step moves (0 jumps)
+      for (const [dr, dc] of directions) {
+        const targetRow = startRow + dr;
+        const targetCol = startCol + dc;
+        if (isValidCell(targetRow, targetCol)) {
+          const cell = getCell(targetRow, targetCol);
+          if (!cell.querySelector('.piece')) {
+            cell.classList.add('valid-move');
+          }
         }
-        return true;
       }
 
+      // Merge and prioritize lower jump counts
+      visited.forEach((jumps, key) => {
+        const [row, col] = key.split(',').map(Number);
+        const cell = getCell(row, col);
+        if (cell.textContent === '' || jumps < parseInt(cell.textContent)) {
+          const jumpNumber = document.createElement('span');
+          jumpNumber.textContent = jumps.toString();
+        }
+      });      
+      
       // Process jump moves with BFS
       while (queue.length > 0) {
         const [row, col, jumps] = queue.shift();
@@ -188,28 +210,6 @@
           }
         }
       }
-
-      // Add single-step moves (0 jumps)
-      for (const [dr, dc] of directions) {
-        const targetRow = startRow + dr;
-        const targetCol = startCol + dc;
-        if (isValidCell(targetRow, targetCol)) {
-          const cell = getCell(targetRow, targetCol);
-          if (!cell.querySelector('.piece')) {
-            cell.classList.add('valid-move');
-          }
-        }
-      }
-
-      // Merge and prioritize lower jump counts
-      visited.forEach((jumps, key) => {
-        const [row, col] = key.split(',').map(Number);
-        const cell = getCell(row, col);
-        if (cell.textContent === '' || jumps < parseInt(cell.textContent)) {
-          const jumpNumber = document.createElement('span');
-          jumpNumber.textContent = jumps.toString();
-        }
-      });
     }
 
     function movePiece(from, toCell) {

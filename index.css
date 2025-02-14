@@ -67,5 +67,20 @@ body {
   z-index: 1000;     /* Keep above other content */
 }
 
+.rules-display {
+  position: fixed;  /* Keep fixed at top */
+  bottom: 0;           /* Anchor to top */
+  left: 0;          /* Stretch full width */
+  right: 0;
+  padding: 10px 10px;  /* Vertical padding */
+  margin-bottom: 0; /* Remove original margin */
+  font-size: 1.5em;
+  text-align: left;
+  background: white; /* Ensure readability */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Visual separation */
+  z-index: 1000;     /* Keep above other content */
+}
+
 .turn-display.player1 { color: red; }
 .turn-display.player2 { color: blue; }
+

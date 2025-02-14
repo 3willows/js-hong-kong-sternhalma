@@ -117,8 +117,11 @@
       let c = startC + dc;
 
       while (r !== endR || c !== endC) {
-        // Ignore selected piece in path checks
-        if (getCell(r, c).querySelector('.piece:not(.selected-piece)')) return false;
+        const currentCell = getCell(r, c);
+        // Allow jumped piece but block others
+        if (currentCell !== getCell(startR + (endR - startR) / 2, startC + (endC - startC) / 2)) {
+          if (currentCell.querySelector('.piece:not(.selected-piece)')) return false;
+        }
         r += dr;
         c += dc;
       }
@@ -128,8 +131,8 @@
     function showValidMoves(fromCell) {
       const startRow = parseInt(fromCell.dataset.row);
       const startCol = parseInt(fromCell.dataset.col);
-      const visited = new Map(); // Tracks minimum jumps to reach each cell
-      const queue = [[startRow, startCol, 0]]; // [row, col, jumps]
+      const visited = new Map();
+      const queue = [[startRow, startCol, 0]];
 
       const directions = [
         [-1, -1], [-1, 0], [-1, 1],
@@ -137,34 +140,11 @@
         [1, -1], [1, 0], [1, 1]
       ];
 
-      // Add single-step moves (0 jumps)
-      for (const [dr, dc] of directions) {
-        const targetRow = startRow + dr;
-        const targetCol = startCol + dc;
-        if (isValidCell(targetRow, targetCol)) {
-          const cell = getCell(targetRow, targetCol);
-          if (!cell.querySelector('.piece')) {
-            cell.classList.add('valid-move');
-          }
-        }
-      }
-
-      // Merge and prioritize lower jump counts
-      visited.forEach((jumps, key) => {
-        const [row, col] = key.split(',').map(Number);
-        const cell = getCell(row, col);
-        if (cell.textContent === '' || jumps < parseInt(cell.textContent)) {
-          const jumpNumber = document.createElement('span');
-          jumpNumber.textContent = jumps.toString();
-        }
-      });      
-      
-      // Process jump moves with BFS
+      // Process jump moves first
       while (queue.length > 0) {
         const [row, col, jumps] = queue.shift();
         const key = `${row},${col}`;
 
-        // Skip if we've already found a better path
         if (visited.has(key) && visited.get(key) <= jumps) continue;
         visited.set(key, jumps);
 
@@ -178,30 +158,30 @@
 
             const checkCell = getCell(checkRow, checkCol);
             if (checkCell.querySelector('.piece')) {
-              if (isPathClear(row, col, checkRow, checkCol)) {
-                const jumpRow = row + dr * (step * 2);
-                const jumpCol = col + dc * (step * 2);
+              const jumpRow = row + dr * (step * 2);
+              const jumpCol = col + dc * (step * 2);
 
-                if (isValidCell(jumpRow, jumpCol)) {
-                  const jumpKey = `${jumpRow},${jumpCol}`;
-                  const totalJumps = jumps + 1;
-                  const jumpCell = getCell(jumpRow, jumpCol);
+              // Key fix: Check path to JUMP destination, not jumped piece
+              if (isValidCell(jumpRow, jumpCol) &&
+                isPathClear(row, col, jumpRow, jumpCol)) {
 
-                  if (!jumpCell.querySelector('.piece') &&
-                    (!visited.has(jumpKey) || totalJumps < visited.get(jumpKey))) {
-                    queue.push([jumpRow, jumpCol, totalJumps]);
-                    jumpCell.classList.add('valid-move');
+                const jumpKey = `${jumpRow},${jumpCol}`;
+                const totalJumps = jumps + 1;
+                const jumpCell = getCell(jumpRow, jumpCol);
 
-                    // Remove existing jump number first to prevent duplicates
-                    const existingNumber = jumpCell.querySelector('.jump-number');
-                    if (existingNumber) existingNumber.remove();
+                if (!jumpCell.querySelector('.piece') &&
+                  (!visited.has(jumpKey) || totalJumps < visited.get(jumpKey))) {
 
-                    const jumpNumber = document.createElement('span');
-                    jumpNumber.className = 'jump-number';
-                    jumpNumber.textContent = totalJumps;
-                    jumpCell.appendChild(jumpNumber);
-                  }
+                  queue.push([jumpRow, jumpCol, totalJumps]);
+                  jumpCell.classList.add('valid-move');
 
+                  const existingNumber = jumpCell.querySelector('.jump-number');
+                  if (existingNumber) existingNumber.remove();
+
+                  const jumpNumber = document.createElement('span');
+                  jumpNumber.className = 'jump-number';
+                  jumpNumber.textContent = totalJumps;
+                  jumpCell.appendChild(jumpNumber);
                 }
               }
               break;
@@ -210,6 +190,28 @@
           }
         }
       }
+
+      // Add single-step moves (0 jumps)
+      for (const [dr, dc] of directions) {
+        const targetRow = startRow + dr;
+        const targetCol = startCol + dc;
+        if (isValidCell(targetRow, targetCol)) {
+          const cell = getCell(targetRow, targetCol);
+          if (!cell.querySelector('.piece')) {
+            cell.classList.add('valid-move');
+          }
+        }
+      }
+
+      // Merge jump counts
+      visited.forEach((jumps, key) => {
+        const [row, col] = key.split(',').map(Number);
+        const cell = getCell(row, col);
+        if (!cell.textContent || jumps < parseInt(cell.textContent)) {
+          const jumpNumber = document.createElement('span');
+          jumpNumber.textContent = jumps.toString();
+        }
+      });
     }
 
     function movePiece(from, toCell) {

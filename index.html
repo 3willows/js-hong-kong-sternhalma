@@ -15,9 +15,40 @@
     const rows = 5, cols = 20;
     let selectedPiece = null;
     const grid = document.getElementById('grid');
+    
 
     // Add at the top with other constants
     let currentPlayer = 'player1';
+
+    // Utility functions
+    function createPiece(playerClass) {
+      const piece = document.createElement('div');
+      piece.className = `piece ${playerClass}`;
+      return piece;
+    }
+
+    function isValidCell(row, col) {
+      return row >= 0 && row < rows && col >= 0 && col < cols;
+    }
+
+    function getCell(row, col) {
+      return document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    }
+
+    function updateTurnDisplay() {
+      const turnDisplay = document.getElementById('turn-display');
+      turnDisplay.textContent = `${currentPlayer === 'player1' ? 'Player 1' : 'Player 2'}'s Turn`;
+      turnDisplay.className = `turn-display ${currentPlayer}`;
+    }
+
+    function clearSelection() {
+      document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
+      document.querySelectorAll('.jump-number').forEach(n => n.remove());
+      if (selectedPiece) {
+        selectedPiece.element.classList.remove('selected', 'selected-piece');
+        selectedPiece = null;
+      }
+    }
 
     // Initialize board
     function createBoard() {
@@ -51,18 +82,6 @@
       }
     }
 
-    function updateTurnDisplay() {
-      const turnDisplay = document.getElementById('turn-display');
-      turnDisplay.textContent = `${currentPlayer === 'player1' ? 'Player 1' : 'Player 2'}'s Turn`;
-      turnDisplay.className = `turn-display ${currentPlayer}`;
-    }
-
-    function createPiece(playerClass) {
-      const piece = document.createElement('div');
-      piece.className = `piece ${playerClass}`;
-      return piece;
-    }
-
     function handleClick(e) {
       const cell = e.currentTarget;
       const piece = cell.querySelector('.piece');
@@ -72,17 +91,14 @@
           // Existing move logic
           movePiece(selectedPiece, cell);
           clearSelection();
-
           // Switch players after valid move
           currentPlayer = currentPlayer === 'player1' ? 'player2' : 'player1';
           updateTurnDisplay();
-
         } else {
           clearSelection();
         }
       } else if (piece) {
         if (!piece.classList.contains(currentPlayer)) return;
-
         selectedPiece = {
           element: piece,
           row: parseInt(cell.dataset.row),
@@ -99,11 +115,6 @@
       const startCol = parseInt(fromCell.dataset.col);
       const visited = new Map(); // Tracks minimum jumps to reach each cell
       const queue = [[startRow, startCol, 0]]; // [row, col, jumps]
-
-      // Clear previous valid moves
-      document.querySelectorAll('.valid-move').forEach(c => {
-        c.classList.remove('valid-move');
-      });
 
       const directions = [
         [-1, -1], [-1, 0], [-1, 1],
@@ -204,23 +215,6 @@
     function movePiece(from, toCell) {
       toCell.appendChild(from.element);
       from.element.classList.remove('selected');
-    }
-
-    function clearSelection() {
-      document.querySelectorAll('.valid-move').forEach(c => c.classList.remove('valid-move'));
-      document.querySelectorAll('.jump-number').forEach(n => n.remove());
-      if (selectedPiece) {
-        selectedPiece.element.classList.remove('selected', 'selected-piece');
-        selectedPiece = null;
-      }
-    }
-
-    function isValidCell(row, col) {
-      return row >= 0 && row < rows && col >= 0 && col < cols;
-    }
-
-    function getCell(row, col) {
-      return document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
     }
 
     createBoard();

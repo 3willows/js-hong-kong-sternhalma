@@ -10,12 +10,18 @@
 
 <body>
   <div class="grid" id="grid"></div>
-  <div class="rules-display">Rules: a piece may jump over a piece any number of empty spaces away, provided it can land the same number of empty spaces beyond it in a straight line. Put another way: A piece can jump a single other piece at any distance, provided that the jumped piece lies at the exact midpoint of the jump. The basic 'adjacent jump' allowed in the standard game is just the shortest form of a long jump. Source: <a href="https://www.mastersofgames.com/rules/chinese-checkers-rules.htm">mastersofgames.com</a></div>
+
+  <div class="rules-display">Rules: a piece may jump over a piece any number of empty spaces away, provided it can land
+    the same number of empty spaces beyond it in a straight line. Put another way: A piece can jump a single other piece
+    at any distance, provided that the jumped piece lies at the exact midpoint of the jump. The basic 'adjacent jump'
+    allowed in the standard game is just the shortest form of a long jump. Source: <a
+      href="https://www.mastersofgames.com/rules/chinese-checkers-rules.htm">mastersofgames.com</a></div>
+
   <script>
     const rows = 5, cols = 20;
     let selectedPiece = null;
     const grid = document.getElementById('grid');
-
+    let moveHistory = [];
 
     // Add at the top with other constants
     let currentPlayer = 'player1';
@@ -88,8 +94,16 @@
 
       if (selectedPiece) {
         if (cell.classList.contains('valid-move')) {
-          // Existing move logic
           movePiece(selectedPiece, cell);
+          // basic way of saving and showing move data
+          const moveData = {
+            player: currentPlayer,
+            from: { row: parseInt(selectedPiece.row), col: parseInt(selectedPiece.col)},
+            to: { row: parseInt(cell.dataset.row), col: parseInt(cell.dataset.col) },
+            timestamp: new Date().toLocaleTimeString()
+          };
+          moveHistory.push(moveData);
+          console.log(moveHistory)
           clearSelection();
           // Switch players after valid move
           currentPlayer = currentPlayer === 'player1' ? 'player2' : 'player1';

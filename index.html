@@ -155,13 +155,14 @@
             const checkCol = col + dc * step;
 
             if (!isValidCell(checkRow, checkCol)) break;
+            // Add line here to exclude situation where checkRow, checkCol is the selected piece itself
+            if (checkRow === startRow && checkCol === startCol) break;
 
             const checkCell = getCell(checkRow, checkCol);
             if (checkCell.querySelector('.piece')) {
               const jumpRow = row + dr * (step * 2);
               const jumpCol = col + dc * (step * 2);
 
-              // Key fix: Check path to JUMP destination, not jumped piece
               if (isValidCell(jumpRow, jumpCol) &&
                 isPathClear(row, col, jumpRow, jumpCol)) {
 

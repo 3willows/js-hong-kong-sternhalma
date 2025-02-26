@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Chinese Checkers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="turn-display" id="turnDisplay"></div>
+    <div class="grid" id="grid"></div>
+    
+    <div class="rules-display">Rules: a piece may jump over a piece any number of empty spaces away, provided it can land
+    the same number of empty spaces beyond it in a straight line. Put another way: A piece can jump a single other piece
+    at any distance, provided that the jumped piece lies at the exact midpoint of the jump. The basic 'adjacent jump'
+    allowed in the standard game is just the shortest form of a long jump. Source: <a
+      href="https://www.mastersofgames.com/rules/chinese-checkers-rules.htm">mastersofgames.com</a></div>
+      
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+</body>
+</html>

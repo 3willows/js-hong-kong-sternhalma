@@ -460,3 +460,153 @@ if (window.innerWidth <= 600) {
   const rulesEl = document.querySelector('.rules-display');
   if (rulesEl) rulesEl.style.display = 'none';
 }
+
+/** Visual Self-Jump Testing Functions **/
+
+// Set up test board with specific configurations to check for self-jumping
+const setupSelfJumpTestBoard = () => {
+  // Save game state for reset
+  window.savedGameState = {
+    boardHTML: grid.innerHTML,
+    currentPlayer: currentPlayer,
+    aiEnabled: aiEnabled
+  };
+  
+  // Clear the board
+  grid.innerHTML = '';
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      const cell = createCell(row, col);
+      grid.appendChild(cell);
+    }
+  }
+  
+  // Disable AI during test
+  aiEnabled = false;
+  currentPlayer = PLAYERS.ONE;
+  
+  // Scenario 1: Complex Jump Network - pieces arranged in a pattern that offers multiple jump paths
+  placePiece(2, 5, PLAYERS.ONE);  // Player piece at center of network
+  
+  // Jump opportunities in multiple directions
+  placePiece(2, 7, PLAYERS.TWO);  // Right
+  placePiece(2, 3, PLAYERS.TWO);  // Left
+  placePiece(0, 5, PLAYERS.TWO);  // Up
+  placePiece(4, 5, PLAYERS.TWO);  // Down
+  placePiece(1, 4, PLAYERS.TWO);  // Diagonal up-left
+  placePiece(3, 6, PLAYERS.TWO);  // Diagonal down-right
+  
+  // Scenario 2: Sequential Jump Test - multiple pieces arranged for chain jumps
+  placePiece(1, 10, PLAYERS.ONE); // Starting piece
+  
+  // Pieces creating potential jump chain
+  placePiece(1, 12, PLAYERS.TWO);
+  placePiece(1, 14, PLAYERS.TWO);
+  placePiece(1, 16, PLAYERS.TWO);
+  placePiece(3, 10, PLAYERS.TWO);
+  placePiece(3, 12, PLAYERS.TWO);
+  
+  // Scenario 3: ZigZag Jump Pattern
+  placePiece(4, 15, PLAYERS.ONE); // Player piece
+  
+  // Pieces forming a zigzag pattern
+  placePiece(3, 16, PLAYERS.TWO);
+  placePiece(2, 15, PLAYERS.TWO);
+  placePiece(1, 16, PLAYERS.TWO);
+  placePiece(0, 15, PLAYERS.TWO);
+  
+  // Scenario 4: Potential Jump Loop - if self-jumping were allowed, this could create a loop
+  placePiece(3, 1, PLAYERS.ONE);  // Player piece
+  
+  // Pieces arranged in a pattern that could create a loop with self-jumping
+  placePiece(2, 0, PLAYERS.TWO);
+  placePiece(1, 1, PLAYERS.TWO);
+  placePiece(2, 2, PLAYERS.TWO);
+  
+  // Show reset button and info
+  document.getElementById('reset-board').style.display = 'block';
+  document.getElementById('test-info').style.display = 'block';
+  document.getElementById('test-self-jump').style.display = 'none';
+  
+  // Update the test info text to be more descriptive
+  document.getElementById('test-info').innerHTML = 
+    'Testing Mode: Try moving the red pieces to verify proper jumping behavior.<br>' +
+    '• Check that jumps follow proper midpoint rules<br>' +
+    '• Verify no self-jumping occurs<br>' +
+    '• Test chain jumps for correct behavior';
+  
+  // Update display
+  updateTurnDisplay();
+  clearSelection();
+};
+
+// Reset board to pre-test state
+const resetTestBoard = () => {
+  if (window.savedGameState) {
+    grid.innerHTML = window.savedGameState.boardHTML;
+    currentPlayer = window.savedGameState.currentPlayer;
+    aiEnabled = window.savedGameState.aiEnabled;
+    
+    // Hide test-related UI
+    document.getElementById('reset-board').style.display = 'none';
+    document.getElementById('test-info').style.display = 'none';
+    document.getElementById('test-self-jump').style.display = 'block';
+    
+    // Clean up
+    window.savedGameState = null;
+    
+    // Update display
+    updateTurnDisplay();
+    clearSelection();
+  }
+};
+
+// Helper function for tests
+const placePiece = (row, col, playerClass) => {
+  const cell = getCell(row, col);
+  if (cell) {
+    const existingPiece = cell.querySelector(`.${CLASSES.PIECE}`);
+    if (existingPiece) existingPiece.remove();
+    cell.appendChild(createPiece(playerClass));
+  }
+};
+
+/** Initialization **/
+// ...existing code...
+
+// Initialize test buttons
+document.addEventListener('DOMContentLoaded', () => {
+  const testButton = document.getElementById('test-self-jump');
+  const resetButton = document.getElementById('reset-board');
+  
+  if (testButton) {
+    testButton.addEventListener('click', setupSelfJumpTestBoard);
+  }
+  
+  if (resetButton) {
+    resetButton.addEventListener('click', resetTestBoard);
+  }
+  
+  // On mobile, hide the test button unless in debug mode
+  if (window.innerWidth <= 600) {
+    testButton.style.display = 'none';
+    
+    // Add debug mode toggle with triple tap
+    let tapCount = 0;
+    let lastTap = 0;
+    
+    document.addEventListener('touchend', () => {
+      const currentTime = new Date().getTime();
+      if (currentTime - lastTap < 500) {
+        tapCount++;
+        if (tapCount === 3) {
+          testButton.style.display = 'block';
+          tapCount = 0;
+        }
+      } else {
+        tapCount = 1;
+      }
+      lastTap = currentTime;
+    });
+  }
+});

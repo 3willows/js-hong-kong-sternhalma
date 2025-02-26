@@ -125,6 +125,40 @@ body {
   color: blue;
 }
 
+.test-button {
+  position: fixed;
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 1000;
+}
+
+#test-self-jump {
+  top: 40px;
+  left: 10px;
+}
+
+#reset-board {
+  top: 40px;
+  left: 150px;
+}
+
+.test-info {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  padding: 10px;
+  background-color: #fff9c4;
+  border: 1px solid #fbc02d;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 1000;
+}
+
 @media (max-width: 600px) {
   .grid {
     /* Update grid cell sizes and reduce outer margin */
@@ -149,6 +183,19 @@ body {
   body {
     height: auto;
     min-height: 100vh;
+  }
+
+  .test-button, .test-info {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  #reset-board {
+    left: 120px;
+  }
+  
+  .test-info {
+    top: 70px;
   }
 }
 

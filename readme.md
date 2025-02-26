@@ -34,3 +34,6 @@ After that, I tinkered first by hand and then by Github co-pilot.  For example,
 - make responsive
 - Add a simple AI: blue makes whatever move reduces the "data-col" the most.
 
+# Notes
+
+- Tests will be really important.  The rules are simple, but many refactors add a "jumping over itself" bug, where the piece that is moved is wrongly counted as an available "middle piece" for the purpose of jumping.

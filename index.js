@@ -256,9 +256,155 @@ const movePiece = (from, toCell) => {
   from.element.classList.remove(CLASSES.SELECTED);
 };
 
+/** AI Functions **/
+
+const isAITurn = () => currentPlayer === PLAYERS.TWO;
+
+const executeAIMove = () => {
+  // Give a small delay so the player can see what's happening
+  setTimeout(() => {
+    const bestMove = findBestMove();
+    if (bestMove) {
+      // Select the piece to move
+      selectPiece(getCell(bestMove.fromRow, bestMove.fromCol), bestMove.piece);
+      
+      // Execute the move
+      setTimeout(() => {
+        const targetCell = getCell(bestMove.toRow, bestMove.toCol);
+        attemptMove(targetCell);
+      }, 500);
+    }
+  }, 1000);
+};
+
+const findBestMove = () => {
+  let bestMove = null;
+  let bestColReduction = -1;
+
+  // Find all player2 pieces
+  document.querySelectorAll(`.${CLASSES.PIECE}.${PLAYERS.TWO}`).forEach(piece => {
+    const cell = piece.parentElement;
+    const fromRow = parseInt(cell.dataset.row);
+    const fromCol = parseInt(cell.dataset.col);
+
+    // Temporarily select this piece to find valid moves
+    const tempSelectedPiece = {
+      element: piece,
+      row: fromRow,
+      col: fromCol
+    };
+    
+    // Save current selected piece if any
+    const savedSelectedPiece = selectedPiece;
+    selectedPiece = tempSelectedPiece;
+    
+    // Find all valid moves for this piece without showing them on the UI
+    const validMoves = findValidMovesForPiece(fromRow, fromCol);
+    
+    // Evaluate each valid move
+    validMoves.forEach(move => {
+      const [toRow, toCol, jumps] = move;
+      const colReduction = fromCol - toCol;
+      
+      // Prefer moves that reduce column position
+      if (colReduction > bestColReduction) {
+        bestColReduction = colReduction;
+        bestMove = {
+          fromRow,
+          fromCol,
+          toRow,
+          toCol,
+          piece: piece
+        };
+      }
+    });
+    
+    // Restore the original selected piece
+    selectedPiece = savedSelectedPiece;
+  });
+  
+  return bestMove;
+};
+
+const findValidMovesForPiece = (startRow, startCol) => {
+  const validMoves = [];
+  const directions = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1], [0, 1],
+    [1, -1], [1, 0], [1, 1]
+  ];
+  const visited = new Map();
+  const queue = [[startRow, startCol, 0]]; // [row, col, jumps]
+
+  while (queue.length) {
+    const [row, col, jumps] = queue.shift();
+    const key = `${row},${col}`;
+    if (visited.has(key) && visited.get(key) <= jumps) continue;
+    visited.set(key, jumps);
+
+    // Track as valid move if not the starting position
+    if (row !== startRow || col !== startCol) {
+      const cell = getCell(row, col);
+      if (!cell.querySelector(`.${CLASSES.PIECE}`)) {
+        validMoves.push([row, col, jumps]);
+      }
+    }
+
+    for (const [dRow, dCol] of directions) {
+      let step = 1;
+      while (true) {
+        const newRow = row + dRow * step;
+        const newCol = col + dCol * step;
+        if (!isValidCell(newRow, newCol)) break;
+        const checkCell = getCell(newRow, newCol);
+        if (checkCell.querySelector(`.${CLASSES.PIECE}`)) {
+          // Check for jump possibility
+          const jumpRow = row + dRow * step * 2;
+          const jumpCol = col + dCol * step * 2;
+          if (isValidCell(jumpRow, jumpCol)) {
+            const jumpCell = getCell(jumpRow, jumpCol);
+            if (!jumpCell.querySelector(`.${CLASSES.PIECE}`) && 
+                isPathClear(row, col, jumpRow, jumpCol)) {
+              const totalJumps = jumps + 1;
+              const jumpKey = `${jumpRow},${jumpCol}`;
+              if (!visited.has(jumpKey) || totalJumps < visited.get(jumpKey)) {
+                queue.push([jumpRow, jumpCol, totalJumps]);
+              }
+            }
+          }
+          break;
+        }
+        step++;
+      }
+    }
+
+    // Add single-step moves
+    if (jumps === 0) {
+      for (const [dRow, dCol] of directions) {
+        const targetRow = row + dRow;
+        const targetCol = col + dCol;
+        if (isValidCell(targetRow, targetCol)) {
+          const cell = getCell(targetRow, targetCol);
+          if (!cell.querySelector(`.${CLASSES.PIECE}`)) {
+            validMoves.push([targetRow, targetCol, 0]);
+          }
+        }
+      }
+    }
+  }
+
+  return validMoves;
+};
+
+// Modify the switch player function to trigger AI move when it's player2's turn
 const switchPlayer = () => {
   currentPlayer = currentPlayer === PLAYERS.ONE ? PLAYERS.TWO : PLAYERS.ONE;
   updateTurnDisplay();
+  
+  // If it's AI's turn after the switch, execute AI move
+  if (isAITurn()) {
+    executeAIMove();
+  }
 };
 
 /** Initialization **/

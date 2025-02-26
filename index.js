@@ -40,7 +40,14 @@ const getCell = (row, col) => document.querySelector(`[data-row="${row}"][data-c
 
 const updateTurnDisplay = () => {
   const turnDisplay = document.getElementById(CLASSES.TURN_DISPLAY);
-  turnDisplay.textContent = `${currentPlayer === PLAYERS.ONE ? 'Player 1' : 'Player 2'}'s Turn`;
+  
+  // Show "AI's Turn" when it's player 2's turn and AI is enabled
+  if (currentPlayer === PLAYERS.TWO && aiEnabled) {
+    turnDisplay.textContent = "AI's Turn";
+  } else {
+    turnDisplay.textContent = `${currentPlayer === PLAYERS.ONE ? 'Player 1' : 'Player 2'}'s Turn`;
+  }
+  
   turnDisplay.className = `${CLASSES.TURN_DISPLAY} ${currentPlayer}`;
 };
 

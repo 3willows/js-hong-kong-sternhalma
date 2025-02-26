@@ -15,7 +15,8 @@ const CLASSES = {
   VALID_MOVE: 'valid-move',
   SELECTED: 'selected',
   JUMP_NUMBER: 'jump-number',
-  TURN_DISPLAY: 'turn-display'
+  TURN_DISPLAY: 'turn-display',
+  MODE_TOGGLE: 'mode-toggle'
 };
 
 // Game State
@@ -23,6 +24,7 @@ let selectedPiece = null;
 let currentPlayer = PLAYERS.ONE;
 const moveHistory = [];
 const grid = document.getElementById('grid');
+let aiEnabled = false; // Default to two human players
 
 /** Helper Functions **/
 
@@ -91,10 +93,20 @@ const createBoard = () => {
       grid.appendChild(cell);
     }
   }
+  
   // Create and insert turn display
   const turnDisplay = document.createElement('div');
   turnDisplay.id = CLASSES.TURN_DISPLAY;
   document.body.insertBefore(turnDisplay, grid);
+  
+  // Create and insert mode toggle button
+  const modeToggle = document.createElement('button');
+  modeToggle.id = CLASSES.MODE_TOGGLE;
+  modeToggle.className = CLASSES.MODE_TOGGLE;
+  modeToggle.textContent = "2 Players";
+  modeToggle.addEventListener('click', toggleGameMode);
+  document.body.insertBefore(modeToggle, grid);
+  
   updateTurnDisplay();
 };
 
@@ -396,15 +408,34 @@ const findValidMovesForPiece = (startRow, startCol) => {
   return validMoves;
 };
 
-// Modify the switch player function to trigger AI move when it's player2's turn
+// Modify the switch player function to respect the current game mode
 const switchPlayer = () => {
   currentPlayer = currentPlayer === PLAYERS.ONE ? PLAYERS.TWO : PLAYERS.ONE;
   updateTurnDisplay();
   
-  // If it's AI's turn after the switch, execute AI move
-  if (isAITurn()) {
+  // If AI is enabled and it's its turn, execute AI move
+  if (aiEnabled && isAITurn()) {
     executeAIMove();
   }
+};
+
+// Toggle between human vs human and human vs AI modes
+const toggleGameMode = () => {
+  aiEnabled = !aiEnabled;
+  
+  const modeToggle = document.getElementById(CLASSES.MODE_TOGGLE);
+  if (aiEnabled) {
+    modeToggle.textContent = "vs AI";
+    // If it's already AI's turn, trigger a move
+    if (isAITurn()) {
+      executeAIMove();
+    }
+  } else {
+    modeToggle.textContent = "2 Players";
+  }
+  
+  // We should restart the game or at least clear any current move in progress
+  clearSelection();
 };
 
 /** Initialization **/

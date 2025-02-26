@@ -111,17 +111,17 @@ body {
 @media (max-width: 600px) {
   .grid {
     /* Update grid cell sizes and reduce outer margin */
-    grid-template-columns: repeat(20, 8vw);
-    grid-template-rows: repeat(5, 8vw);
+    grid-template-columns: repeat(20, 6vw);
+    grid-template-rows: repeat(5, 6vw);
     transform: rotate(90deg);
     transform-origin: center center;
-    margin: 2vw auto;
+    margin: ;
   }
 
   .cell {
     /* Increase cell dimensions to match new grid size */
-    width: 7vw;
-    height: 7vw;
+    width: 5vw;
+    height: 5vw;
     overflow: visible;
   }
 

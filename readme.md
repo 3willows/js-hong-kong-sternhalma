@@ -1,10 +1,10 @@
 # Live website
 
-https://3willows.github.io/super-chinese-checkers/
+https://3willows.github.io/js-hong-kong-sternhalma/
 
 ## About
 
-The version of Chinese Checkers I play at home is apparently a variation called ["Super Chinese Checkers"](https://www.mastersofgames.com/rules/chinese-checkers-rules.htm), where (quote)
+The version of Chinese Checkers I play in Hong kong is a variation called ["Super Chinese Checkers"](https://www.mastersofgames.com/rules/chinese-checkers-rules.htm), where (quote)
 
 > "...a piece may jump over a piece any number of empty spaces away, provided it can land the same number of empty spaces beyond it in a straight line.
 
@@ -36,4 +36,4 @@ After that, I tinkered first by hand and then by Github co-pilot.  For example,
 
 # Notes
 
-- Tests are an important missing part of the project.  The rules are simple, but many refactors add a "jumping over itself" bug, where the piece that is moved is wrongly counted as an available "middle piece" for the purpose of jumping.
+- Testing is an important missing part of the project.  The rules are simple, but many refactors add a "jumping over itself" bug, where the piece that is moved is wrongly counted as an available "middle piece" for the purpose of jumping.

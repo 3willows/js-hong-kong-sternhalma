@@ -30,10 +30,7 @@ Prompts to get the project started.
 After that, I tinkered first by hand and then by Github co-pilot.  For example, 
 
 - it took some wrangling to get the jumping behaviour to work correctly?
-
 - using "textContent" to record the number of jumps required to get somewhere was too aggressive.  Clearing it by "setting cell.textContent = """ took out everything within as well (including the piece).
-
 - make responsive
-
 - Add a simple AI: blue makes whatever move reduces the "data-col" the most.
 

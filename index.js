@@ -24,7 +24,7 @@ let selectedPiece = null;
 let currentPlayer = PLAYERS.ONE;
 const moveHistory = [];
 const grid = document.getElementById('grid');
-let aiEnabled = false; // Default to two human players
+let aiEnabled = true; // Default to AI mode instead of two human players
 
 /** Helper Functions **/
 
@@ -110,7 +110,7 @@ const createBoard = () => {
   const modeToggle = document.createElement('button');
   modeToggle.id = CLASSES.MODE_TOGGLE;
   modeToggle.className = CLASSES.MODE_TOGGLE;
-  modeToggle.textContent = "2 Players";
+  modeToggle.textContent = "vs AI"; // Default text shows AI mode is active
   modeToggle.addEventListener('click', toggleGameMode);
   document.body.insertBefore(modeToggle, grid);
   

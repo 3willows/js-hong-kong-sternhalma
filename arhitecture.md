@@ -11,19 +11,23 @@ The game logic is implemented in `index.js` and includes the following component
 - **Board Representation**: 
   - The board is represented as a 2D array where each cell can be empty or contain a piece.
   - Each piece has a color and a position on the board.
+  - The board is initialized with pieces for two players, placed at opposite ends of the grid.
 
 - **Rules Engine**:
-  - The rules engine enforces the rules of Chinese Checkers.
+  - The rules engine enforces the rules of Super Chinese Checkers.
   - It checks for valid moves, including single-step moves and jumps over other pieces.
   - It ensures that moves are within the boundaries of the board and follow the game's rules.
+  - The rules allow a piece to jump over another piece any number of empty spaces away, provided it can land the same number of empty spaces beyond it in a straight line.
 
 - **Move Validation**:
   - The move validation function checks if a move is valid based on the current state of the board.
   - It verifies that the destination cell is empty and that the move follows the allowed patterns (single-step or jump).
+  - The function `isPathClear` checks if the path between the start and end cells is clear for movement, allowing for jumps over exactly one piece at the midpoint.
 
 - **Game State Management**:
   - The game state includes the current positions of all pieces, whose turn it is, and the status of the game (ongoing, won, drawn).
   - Functions are provided to update the game state after each move and to check for win conditions.
+  - The `moveHistory` array keeps track of all moves made during the game, including the player, start and end positions, and timestamp.
 
 ### 2. User Interface
 - **Graphical Representation**: Renders the game board and pieces on the screen.

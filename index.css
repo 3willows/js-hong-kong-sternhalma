@@ -15,6 +15,9 @@ body {
   background: #fff;
   padding: 5px;
   border-radius: 5px;
+  /* Removed modifications for full-screen dimensions */
+  /* width: 100vw; */
+  /* height: calc(100vh - 60px); */
 }
 
 .cell {
@@ -53,46 +56,81 @@ body {
 }
 
 .turn-display {
-  position: fixed;  /* Keep fixed at top */
-  top: 0;           /* Anchor to top */
-  left: 0;          /* Stretch full width */
+  position: fixed;
+  /* Keep fixed at top */
+  top: 0;
+  /* Anchor to top */
+  left: 0;
+  /* Stretch full width */
   right: 0;
-  padding: 10px 0;  /* Vertical padding */
-  margin-bottom: 0; /* Remove original margin */
+  padding: 10px 0;
+  /* Vertical padding */
+  margin-bottom: 0;
+  /* Remove original margin */
   font-size: 3vw;
   font-weight: bold;
   text-align: center;
-  background: white; /* Ensure readability */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Visual separation */
-  z-index: 1000;     /* Keep above other content */
+  background: white;
+  /* Ensure readability */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* Visual separation */
+  z-index: 1000;
+  /* Keep above other content */
 }
 
 .rules-display {
-  position: fixed;  /* Keep fixed at top */
-  bottom: 0;           /* Anchor to top */
-  left: 0;          /* Stretch full width */
+  position: fixed;
+  /* Keep fixed at top */
+  bottom: 0;
+  /* Anchor to top */
+  left: 0;
+  /* Stretch full width */
   right: 0;
-  padding: 10px 10px;  /* Vertical padding */
-  margin-bottom: 0; /* Remove original margin */
+  padding: 10px 10px;
+  /* Vertical padding */
+  margin-bottom: 0;
+  /* Remove original margin */
   font-size: 2.5vw;
   text-align: left;
-  background: white; /* Ensure readability */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Visual separation */
-  z-index: 1000;     /* Keep above other content */
+  background: white;
+  /* Ensure readability */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* Visual separation */
+  z-index: 1000;
+  /* Keep above other content */
 }
 
-.turn-display.player1 { color: red; }
-.turn-display.player2 { color: blue; }
+.turn-display.player1 {
+  color: red;
+}
+
+.turn-display.player2 {
+  color: blue;
+}
 
 @media (max-width: 600px) {
   .grid {
-    grid-template-columns: repeat(20, 8vw);
-    grid-template-rows: repeat(5, 8vw);
+    grid-template-columns: repeat(20, 5vw);
+    grid-template-rows: repeat(5, 5vw);
+    /* Removed rotation and full-screen adjustments */
+    transform: rotate(90deg);
+    transform-origin: center center;
+    margin: auto;
   }
 
   .cell {
-    width: 8vw;
-    height: 8vw;
+    width: 5vw;
+    height: 5vw;
+    overflow: visible;
+  }
+
+  .rules-display {
+    display: none;
+  }
+
+  body {
+    height: auto;
+    min-height: 100vh;
   }
 }
 

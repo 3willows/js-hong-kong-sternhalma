@@ -64,7 +64,10 @@ const createCell = (row, col) => {
   cell.className = CLASSES.CELL;
   cell.dataset.row = row;
   cell.dataset.col = col;
-  cell.addEventListener('click', handleClick);
+  cell.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    handleClick(e);
+  });
   return cell;
 };
 
@@ -153,7 +156,7 @@ const isPathClear = (startRow, startCol, endRow, endCol) => {
   while (currentRow !== endRow || currentCol !== endCol) {
     const currentCell = getCell(currentRow, currentCol);
     const isMidpoint = currentRow === startRow + (endRow - startRow) / 2 &&
-                       currentCol === startCol + (endCol - startCol) / 2;
+      currentCol === startCol + (endCol - startCol) / 2;
     if (!isMidpoint && currentCell.querySelector(`.${CLASSES.PIECE}:not(.selected-piece)`)) {
       return false;
     }
@@ -168,8 +171,8 @@ const showValidMoves = fromCell => {
   const startCol = parseInt(fromCell.dataset.col);
   const directions = [
     [-1, -1], [-1, 0], [-1, 1],
-    [0, -1],           [0, 1],
-    [1, -1],  [1, 0],  [1, 1]
+    [0, -1], [0, 1],
+    [1, -1], [1, 0], [1, 1]
   ];
   const visited = new Map();
   const queue = [[startRow, startCol, 0]]; // [row, col, jumps]
@@ -208,7 +211,7 @@ const processJump = (queue, baseRow, baseCol, checkRow, checkCol, dRow, dCol, st
   const totalJumps = jumps + 1;
   const jumpCell = getCell(jumpRow, jumpCol);
   if (!jumpCell.querySelector(`.${CLASSES.PIECE}`) &&
-      (!visited.has(key) || totalJumps < visited.get(key))) {
+    (!visited.has(key) || totalJumps < visited.get(key))) {
     queue.push([jumpRow, jumpCol, totalJumps]);
     updateIndicator(jumpCell, totalJumps);
   }
@@ -260,3 +263,9 @@ const switchPlayer = () => {
 
 /** Initialization **/
 createBoard();
+
+// Hide rules on mobile devices
+if (window.innerWidth <= 600) {
+  const rulesEl = document.querySelector('.rules-display');
+  if (rulesEl) rulesEl.style.display = 'none';
+}

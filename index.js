@@ -25,6 +25,7 @@ let currentPlayer = PLAYERS.ONE;
 const moveHistory = [];
 const grid = document.getElementById('grid');
 let aiEnabled = true; // Default to AI mode instead of two human players
+let aiIsPlaying = false; // New flag to track when AI is making a move
 
 /** Helper Functions **/
 
@@ -120,6 +121,9 @@ const createBoard = () => {
 /** Event Handlers **/
 
 const handleClick = e => {
+  // Ignore clicks when AI is playing
+  if (aiIsPlaying) return;
+  
   const cell = e.currentTarget;
   const piece = cell.querySelector(`.${CLASSES.PIECE}`);
   if (selectedPiece) {
@@ -284,6 +288,9 @@ const movePiece = (from, toCell) => {
 const isAITurn = () => currentPlayer === PLAYERS.TWO;
 
 const executeAIMove = () => {
+  // Set the flag to indicate AI is playing
+  aiIsPlaying = true;
+  
   // Give a small delay so the player can see what's happening
   setTimeout(() => {
     const bestMove = findBestMove();
@@ -295,7 +302,13 @@ const executeAIMove = () => {
       setTimeout(() => {
         const targetCell = getCell(bestMove.toRow, bestMove.toCol);
         attemptMove(targetCell);
+        
+        // Clear the flag when AI move is complete
+        aiIsPlaying = false;
       }, 500);
+    } else {
+      // Clear the flag if no move is found
+      aiIsPlaying = false;
     }
   }, 1000);
 };

@@ -208,6 +208,10 @@ const showValidMoves = fromCell => {
         const newRow = row + dRow * step;
         const newCol = col + dCol * step;
         if (!isValidCell(newRow, newCol)) break;
+        
+        // Add check to prevent jumping over the selected piece itself
+        if (newRow === startRow && newCol === startCol) break;
+        
         const checkCell = getCell(newRow, newCol);
         if (checkCell.querySelector(`.${CLASSES.PIECE}`)) {
           processJump(queue, row, col, newRow, newCol, dRow, dCol, step, jumps, visited);
@@ -375,6 +379,10 @@ const findValidMovesForPiece = (startRow, startCol) => {
         const newRow = row + dRow * step;
         const newCol = col + dCol * step;
         if (!isValidCell(newRow, newCol)) break;
+        
+        // Add check to prevent jumping over the selected piece itself
+        if (newRow === startRow && newCol === startCol) break;
+        
         const checkCell = getCell(newRow, newCol);
         if (checkCell.querySelector(`.${CLASSES.PIECE}`)) {
           // Check for jump possibility
@@ -394,20 +402,6 @@ const findValidMovesForPiece = (startRow, startCol) => {
           break;
         }
         step++;
-      }
-    }
-
-    // Add single-step moves
-    if (jumps === 0) {
-      for (const [dRow, dCol] of directions) {
-        const targetRow = row + dRow;
-        const targetCol = col + dCol;
-        if (isValidCell(targetRow, targetCol)) {
-          const cell = getCell(targetRow, targetCol);
-          if (!cell.querySelector(`.${CLASSES.PIECE}`)) {
-            validMoves.push([targetRow, targetCol, 0]);
-          }
-        }
       }
     }
   }

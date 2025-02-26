@@ -1,56 +1,78 @@
 # Super Chinese Checkers - Architecture Overview
 
 ## Overview
-The Super Chinese Checkers project is a digital implementation of the traditional Chinese Checkers board game. The architecture of the project is designed to handle game logic, user interface, and player interactions.
+The Super Chinese Checkers project is a digital implementation of a variation of the traditional Chinese Checkers board game. This version allows pieces to jump over other pieces at any distance, provided the landing spot is equidistant from the jumped piece. The architecture is designed to handle game logic, user interface, and player interactions on a rectangular 5x20 grid.
 
-## Components
+## Implemented Components
 
 ### 1. Game Logic
-The game logic is implemented in `index.js` and includes the following components:
+The game logic in `index.js` includes:
 
 - **Board Representation**: 
-  - The board is represented as a 2D array where each cell can be empty or contain a piece.
-  - Each piece has a color and a position on the board.
-  - The board is initialized with pieces for two players, placed at opposite ends of the grid.
+  - Implemented as a 5x20 grid of cells
+  - Each cell can contain a player piece or be empty
+  - Pieces are visually represented with red (Player 1) or blue (Player 2/AI) colored divs
 
 - **Rules Engine**:
-  - The rules engine enforces the rules of Super Chinese Checkers.
-  - It checks for valid moves, including single-step moves and jumps over other pieces.
-  - It ensures that moves are within the boundaries of the board and follow the game's rules.
-  - The rules allow a piece to jump over another piece any number of empty spaces away, provided it can land the same number of empty spaces beyond it in a straight line.
+  - Fully implements Super Chinese Checkers rules for valid moves:
+    - Adjacent single-step moves
+    - Jumping over pieces at any distance with the jumped piece at the midpoint
+    - Multiple consecutive jumps tracked and displayed
 
 - **Move Validation**:
-  - The move validation function checks if a move is valid based on the current state of the board.
-  - It verifies that the destination cell is empty and that the move follows the allowed patterns (single-step or jump).
-  - The function `isPathClear` checks if the path between the start and end cells is clear for movement, allowing for jumps over exactly one piece at the midpoint.
+  - The `showValidMoves` function identifies and highlights all valid moves for a selected piece
+  - `isPathClear` verifies that the path between cells is valid for jumping
+  - Efficient pathfinding using a queue-based approach to find all possible moves
 
 - **Game State Management**:
-  - The game state includes the current positions of all pieces, whose turn it is, and the status of the game (ongoing, won, drawn).
-  - Functions are provided to update the game state after each move and to check for win conditions.
-  - The `moveHistory` array keeps track of all moves made during the game, including the player, start and end positions, and timestamp.
+  - Tracks current player's turn with visual indicators
+  - Maintains move history with timestamp, start position, and end position
+  - Supports AI vs. human and human vs. human game modes via toggle
 
 ### 2. User Interface
-- **Graphical Representation**: Renders the game board and pieces on the screen.
-- **User Input Handling**: Captures and processes user inputs, such as selecting and moving pieces.
-- **Animations and Effects**: Provides visual feedback for user actions, such as piece movements and captures.
+- **Graphical Representation**: 
+  - Grid-based board with responsive sizing
+  - Colored pieces with visual feedback on selection
+  - Highlighted cells for valid moves with jump count indicators
+
+- **User Input Handling**: 
+  - Click/touch to select pieces and make moves
+  - Visual feedback for selected pieces and valid destinations
+  - Mode toggle button for switching between AI and two-player modes
+
+- **Display Components**:
+  - Turn indicator showing current player
+  - Rules explanation display (hidden on mobile)
+  - Game mode selector
 
 ### 3. Player Interaction
-- **Human Player**: Allows a human player to interact with the game through the user interface.
-- **AI Player**: Implements artificial intelligence to play against the human player or other AI players.
-- **Multiplayer Support**: Enables multiple human players to play against each other, either locally or over a network.
-
-### 4. Utilities
-- **Configuration Management**: Handles game settings and preferences.
-- **Logging and Debugging**: Provides tools for logging game events and debugging issues.
-- **Persistence**: Saves and loads game states to allow players to resume games.
+- **Human Player**: Implemented with intuitive click/touch interaction
+- **AI Player**: Simple AI that prioritizes moves reducing column position (moving toward goal)
+- **Game Mode Toggle**: Switch between playing against AI or another human player
 
 ## Data Flow
-1. **User Input**: The user interacts with the game through the user interface.
-2. **Input Processing**: The input is processed to determine the intended action.
-3. **Move Validation**: The game logic validates the move according to the rules.
-4. **Game State Update**: If the move is valid, the game state is updated.
-5. **UI Update**: The user interface is updated to reflect the new game state.
-6. **AI Processing**: If playing against an AI, the AI processes its move and the cycle repeats.
+1. **User Input**: Player clicks/taps a piece of their color
+2. **Selection Processing**: System highlights the piece and calculates valid moves
+3. **Move Visualization**: Valid destinations are highlighted with indicators showing jump counts
+4. **Move Execution**: Player clicks a valid destination to complete their move
+5. **Game State Update**: Turn switches to the next player
+6. **AI Processing**: If AI mode is enabled and it's AI's turn, it automatically selects and makes a move
 
-## Conclusion
-The architecture of the Super Chinese Checkers project is modular, with clear separation of concerns between game logic, user interface, and player interaction. This design allows for easy maintenance and potential future enhancements, such as adding new game modes or improving the AI.
+## AI Implementation
+The AI uses a simple heuristic approach:
+- Evaluates all possible moves for each AI piece
+- Prioritizes moves that advance pieces toward the goal (reducing column position)
+- Executes moves with animated timing for better visibility
+
+## Responsive Design
+- Adapts to different screen sizes
+- Portrait orientation on mobile devices with rotated board
+- Simplified interface on smaller screens (hides rules)
+
+## Future Enhancements
+Potential improvements that could be implemented:
+1. Win condition detection and game completion flow
+2. More sophisticated AI with different difficulty levels
+3. Local storage for saving game state
+4. Customizable board sizes and colors
+5. More traditional hexagonal board representation
